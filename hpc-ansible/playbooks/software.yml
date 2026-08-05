@@ -1,0 +1,16 @@
+---
+
+- name: Install HPC software environment
+
+  hosts: all
+
+  become: true
+
+
+  roles:
+
+    - lmod
+
+    - cuda-toolkit
+
+    - openmpi

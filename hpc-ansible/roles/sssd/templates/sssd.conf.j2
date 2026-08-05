@@ -1,0 +1,47 @@
+[sssd]
+
+services = nss, pam
+
+config_file_version = 2
+
+domains = LDAP
+
+
+
+[nss]
+
+filter_users = root
+
+filter_groups = root
+
+
+
+[pam]
+
+
+
+[domain/LDAP]
+
+id_provider = ldap
+
+
+ldap_uri = {{ ldap_uri }}
+
+ldap_search_base = {{ ldap_base_dn }}
+
+
+ldap_user_search_base = {{ ldap_user_base }}
+
+ldap_group_search_base = {{ ldap_group_base }}
+
+
+cache_credentials = {{ sssd_cache_credentials | lower }}
+
+
+enumerate = false
+
+
+ldap_tls_reqcert = {{ 'demand' if ldap_tls_enabled else 'allow' }}
+
+
+ldap_schema = rfc2307

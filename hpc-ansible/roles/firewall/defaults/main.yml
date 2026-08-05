@@ -1,0 +1,8 @@
+---
+
+firewall_enabled: false
+
+
+firewall_services:
+
+  - ssh

@@ -1,0 +1,24 @@
+---
+
+slurm_packages:
+
+  - slurm
+
+  - slurm-slurmd
+
+  - slurm-contribs
+
+
+slurm_service: slurmd
+
+
+slurm_conf_dir: /etc/slurm
+
+
+slurmd_spool_dir: /var/spool/slurmd
+
+
+slurm_user: slurm
+
+
+slurm_group: slurm

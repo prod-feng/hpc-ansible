@@ -1,0 +1,83 @@
+---
+
+- name: Install Slurm controller packages
+
+  dnf:
+
+    name:
+
+      - slurm
+
+      - slurm-slurmctld
+
+      - slurm-contribs
+
+    state: present
+
+
+
+- name: Create Slurm configuration directory
+
+  file:
+
+    path: "{{ slurm_conf_dir }}"
+
+    state: directory
+
+    owner: root
+
+    group: root
+
+    mode: '0755'
+
+
+
+- name: Deploy slurm.conf
+
+  template:
+
+    src: slurm.conf.j2
+
+    dest: "{{ slurm_conf_dir }}/slurm.conf"
+
+    owner: root
+
+    group: root
+
+    mode: '0644'
+
+  notify:
+
+    - Restart slurmctld
+
+
+
+- name: Deploy cgroup configuration
+
+  template:
+
+    src: cgroup.conf.j2
+
+    dest: "{{ slurm_conf_dir }}/cgroup.conf"
+
+    owner: root
+
+    group: root
+
+    mode: '0644'
+
+  notify:
+
+    - Restart slurmctld
+
+
+
+- name: Enable slurmctld
+
+  service:
+
+    name: slurmctld
+
+    enabled: true
+
+    state: started

@@ -1,0 +1,5 @@
+---
+
+lmod_package: Lmod
+
+module_root: /opt/apps

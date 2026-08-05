@@ -1,0 +1,49 @@
+---
+
+- name: Install common packages
+  dnf:
+    name: "{{ common_packages }}"
+    state: present
+
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ timezone }}"
+
+
+- name: Disable unnecessary services
+
+  service:
+    name: "{{ item }}"
+    enabled: false
+    state: stopped
+
+  loop:
+
+    - firewalld
+
+  ignore_errors: true
+
+
+- name: Configure HPC limits
+
+  template:
+
+    src: limits.conf.j2
+
+    dest: /etc/security/limits.d/hpc.conf
+
+    owner: root
+
+    group: root
+
+    mode: '0644'
+
+  when: limits_enabled
+
+
+- name: Set hostname from inventory
+
+  hostname:
+
+    name: "{{ inventory_hostname }}"

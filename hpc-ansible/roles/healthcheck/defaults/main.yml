@@ -1,0 +1,9 @@
+---
+
+healthcheck_gpu_required: false
+
+healthcheck_mounts:
+
+  - /lustre
+
+  - /gpfs

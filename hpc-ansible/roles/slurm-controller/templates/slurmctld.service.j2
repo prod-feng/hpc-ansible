@@ -1,0 +1,24 @@
+[Unit]
+
+Description=Slurm Controller
+
+
+After=network.target munge.service
+
+
+
+[Service]
+
+Type=simple
+
+User=slurm
+
+ExecStart=/usr/sbin/slurmctld -D
+
+Restart=always
+
+
+
+[Install]
+
+WantedBy=multi-user.target

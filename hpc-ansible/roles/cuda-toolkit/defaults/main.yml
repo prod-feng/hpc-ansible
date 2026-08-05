@@ -1,0 +1,6 @@
+---
+
+cuda_version: "12.6"
+
+
+cuda_root: "/usr/local/cuda-{{ cuda_version }}"

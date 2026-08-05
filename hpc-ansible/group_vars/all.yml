@@ -1,0 +1,43 @@
+---
+
+cluster_name: research
+
+domain_name: lab.local
+
+slurm_cluster_name: research
+
+controller_host: head01
+
+ldap_uri: ldap://ldap.lab.local
+
+ldap_base_dn: dc=lab,dc=local
+
+timezone: America/New_York
+
+ntp_server: head01
+
+munge_user: munge
+
+slurm_user: slurm
+
+gpu_driver_version: "570"
+
+cuda_version: "12.6"
+
+gpu_type: nvidia
+
+gres_type: gpu
+
+gres_count: 8
+
+lustre_mounts:
+
+  - mount: /lustre
+
+    device: 10.10.0.10@tcp:/lustrefs
+
+gpfs_mounts:
+
+  - mount: /gpfs
+
+    filesystem: gpfs0

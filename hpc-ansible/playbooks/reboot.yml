@@ -1,0 +1,28 @@
+---
+
+- name: Reboot HPC nodes
+
+  hosts: compute:gpu
+
+  become: true
+  maintenance_batch_size: 25
+  serial: "{{ maintenance_batch_size }}"
+
+
+  tasks:
+
+
+    - name: Reboot node
+
+      reboot:
+
+        reboot_timeout: 900
+
+        test_command: uptime
+
+
+    - name: Wait for SSH
+
+      wait_for_connection:
+
+        timeout: 300

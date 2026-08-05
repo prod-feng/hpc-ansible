@@ -1,0 +1,53 @@
+---
+
+- name: Check NVIDIA driver
+
+  command:
+
+    cmd: nvidia-smi
+
+  register: nvidia_status
+
+  changed_when: false
+
+  failed_when: false
+
+
+
+- name: Install podman
+
+  dnf:
+
+    name:
+
+      - podman
+
+    state: present
+
+
+
+- name: Start DCGM exporter container
+
+  containers.podman.podman_container:
+
+    name: dcgm-exporter
+
+    image: "{{ dcgm_exporter_image }}"
+
+    state: started
+
+    restart_policy: always
+
+    publish:
+
+      - "{{ dcgm_port }}:9400"
+
+    device:
+
+      - /dev/nvidiactl
+
+      - /dev/nvidia0
+
+  when:
+
+    - nvidia_status.rc == 0

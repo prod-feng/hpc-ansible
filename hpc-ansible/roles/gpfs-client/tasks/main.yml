@@ -1,0 +1,71 @@
+---
+
+- name: Install GPFS client packages
+
+  dnf:
+
+    name: "{{ gpfs_packages }}"
+
+    state: present
+
+
+
+- name: Create GPFS mount directories
+
+  file:
+
+    path: "{{ item.mount }}"
+
+    state: directory
+
+    owner: root
+
+    group: root
+
+    mode: "0755"
+
+  loop:
+
+    - "{{ gpfs_mounts }}"
+
+
+
+- name: Check GPFS cluster membership
+
+  command:
+
+    cmd: mmlscluster
+
+  register: gpfs_cluster
+
+  failed_when: false
+
+  changed_when: false
+
+
+
+- name: Start GPFS daemon
+
+  command:
+
+    cmd: mmstartup -a
+
+  when:
+
+    - gpfs_cluster.rc == 0
+
+
+
+- name: Mount GPFS filesystems
+
+  command:
+
+    cmd: "mmmount {{ item.filesystem }} -a"
+
+  loop:
+
+    - "{{ gpfs_mounts }}"
+
+  when:
+
+    - gpfs_cluster.rc == 0

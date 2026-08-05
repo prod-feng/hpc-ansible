@@ -1,0 +1,8 @@
+---
+
+chrony_package: chrony
+
+chrony_service: chronyd
+
+chrony_servers:
+  - "{{ ntp_server }}"

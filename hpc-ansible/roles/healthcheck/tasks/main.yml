@@ -1,0 +1,139 @@
+---
+
+- name: Check hostname
+
+  command:
+
+    cmd: hostname
+
+  register: hostname_check
+
+  changed_when: false
+
+
+- name: Display hostname
+
+  debug:
+
+    msg: "Node {{ hostname_check.stdout }} online"
+
+
+
+- name: Check Munge service
+
+  service_facts
+
+
+- name: Verify Munge is running
+
+  assert:
+
+    that:
+
+      - ansible_facts.services['munge.service'].state == 'running'
+
+    fail_msg: "Munge service is not running"
+
+
+
+- name: Check Slurm daemon on compute nodes
+
+  command:
+
+    cmd: systemctl is-active slurmd
+
+  register: slurmd_check
+
+  changed_when: false
+
+  when: "'compute' in group_names or 'gpu' in group_names"
+
+
+
+- name: Verify slurmd
+
+  assert:
+
+    that:
+
+      - slurmd_check.stdout == "active"
+
+    fail_msg: "slurmd is not running"
+
+  when: "'compute' in group_names or 'gpu' in group_names"
+
+
+
+- name: Check filesystem mounts
+
+  command:
+
+    cmd: "mountpoint {{ item }}"
+
+  loop: "{{ healthcheck_mounts }}"
+
+  register: mount_checks
+
+  changed_when: false
+
+  failed_when: false
+
+
+
+- name: Display filesystem status
+
+  debug:
+
+    var: mount_checks.results
+
+
+
+- name: Check NVIDIA GPU
+
+  command:
+
+    cmd: nvidia-smi -L
+
+  register: gpu_check
+
+  changed_when: false
+
+  failed_when: false
+
+  when:
+
+    - "'gpu' in group_names"
+
+
+
+- name: Display GPU status
+
+  debug:
+
+    var: gpu_check.stdout_lines
+
+  when:
+
+    - "'gpu' in group_names"
+
+
+
+- name: Check InfiniBand
+
+  command:
+
+    cmd: ibstat
+
+  register: ib_check
+
+  changed_when: false
+
+  failed_when: false
+
+
+
+- name: Display InfiniBand status
+
+  debug:
+
+    var: ib_check.stdout_lines

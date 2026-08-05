@@ -1,0 +1,25 @@
+---
+
+- name: Install monitoring agents
+
+  hosts: all
+
+  become: true
+
+
+  roles:
+
+    - node-exporter
+
+
+
+- name: Install GPU monitoring
+
+  hosts: gpu
+
+  become: true
+
+
+  roles:
+
+    - dcgm-exporter

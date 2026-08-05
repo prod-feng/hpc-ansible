@@ -1,0 +1,77 @@
+---
+
+- name: Install SSSD LDAP packages
+
+  dnf:
+
+    name: "{{ sssd_packages }}"
+
+    state: present
+
+
+
+- name: Create SSSD configuration directory
+
+  file:
+
+    path: /etc/sssd
+
+    state: directory
+
+    owner: root
+
+    group: root
+
+    mode: '0700'
+
+
+
+- name: Deploy SSSD configuration
+
+  template:
+
+    src: sssd.conf.j2
+
+    dest: /etc/sssd/sssd.conf
+
+    owner: root
+
+    group: root
+
+    mode: '0600'
+
+  notify:
+
+    - Restart sssd
+
+
+
+- name: Enable SSSD
+
+  service:
+
+    name: "{{ sssd_service }}"
+
+    enabled: true
+
+    state: started
+
+
+
+- name: Configure NSS for SSSD
+
+  lineinfile:
+
+    path: /etc/nsswitch.conf
+
+    regexp: "^{{ item }}:"
+
+    line: "{{ item }}: files sss"
+
+  loop:
+
+    - passwd
+
+    - group
+
+    - shadow

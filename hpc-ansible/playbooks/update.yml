@@ -1,0 +1,28 @@
+---
+
+- name: Update HPC nodes
+
+  hosts: compute:gpu
+
+  become: true
+
+  serial: 25
+
+
+  tasks:
+
+
+    - name: Update Rocky Linux packages
+
+      dnf:
+
+        name: "*"
+
+        state: latest
+
+
+    - name: Remove old packages
+
+      dnf:
+
+        autoremove: true

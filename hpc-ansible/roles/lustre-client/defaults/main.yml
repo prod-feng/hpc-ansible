@@ -1,0 +1,19 @@
+---
+
+lustre_packages:
+
+  - lustre-client
+
+
+lustre_mounts:
+
+  - mount: /lustre
+
+    device: "10.10.0.10@tcp:/lustrefs"
+
+    fstype: lustre
+
+    options: "defaults,_netdev"
+
+
+lustre_enabled: true

@@ -1,0 +1,28 @@
+---
+
+- name: Configure firewalld
+
+  service:
+
+    name: firewalld
+
+    enabled: "{{ firewall_enabled }}"
+
+    state: "{{ 'started' if firewall_enabled else 'stopped' }}"
+
+
+- name: Allow services
+
+  firewalld:
+
+    service: "{{ item }}"
+
+    permanent: true
+
+    state: enabled
+
+    immediate: true
+
+  loop: "{{ firewall_services }}"
+
+  when: firewall_enabled

@@ -1,0 +1,30 @@
+---
+
+sssd_packages:
+
+  - sssd
+
+  - sssd-ldap
+
+  - sssd-tools
+
+  - openldap-clients
+
+
+sssd_service: sssd
+
+
+ldap_uri: ldap://ldap.lab.local
+
+ldap_base_dn: dc=lab,dc=local
+
+
+ldap_user_base: ou=People,{{ ldap_base_dn }}
+
+ldap_group_base: ou=Groups,{{ ldap_base_dn }}
+
+
+ldap_tls_enabled: false
+
+
+sssd_cache_credentials: true

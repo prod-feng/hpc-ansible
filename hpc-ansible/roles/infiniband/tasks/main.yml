@@ -1,0 +1,63 @@
+---
+
+- name: Install InfiniBand packages
+
+  dnf:
+
+    name: "{{ ib_packages }}"
+
+    state: present
+
+
+
+- name: Enable RDMA service
+
+  service:
+
+    name: "{{ rdma_service }}"
+
+    enabled: true
+
+    state: started
+
+
+
+- name: Load InfiniBand kernel modules
+
+  modprobe:
+
+    name: "{{ item }}"
+
+    state: present
+
+  loop:
+
+    - ib_core
+
+    - ib_uverbs
+
+    - mlx5_core
+
+    - mlx5_ib
+
+
+
+- name: Verify InfiniBand devices
+
+  command:
+
+    cmd: ibstat
+
+  register: ibstat_output
+
+  changed_when: false
+
+  failed_when: false
+
+
+
+- name: Display InfiniBand status
+
+  debug:
+
+    var: ibstat_output.stdout_lines

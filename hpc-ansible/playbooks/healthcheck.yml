@@ -1,0 +1,12 @@
+---
+
+- name: HPC cluster health check
+
+  hosts: all
+
+  become: true
+
+
+  roles:
+
+    - healthcheck

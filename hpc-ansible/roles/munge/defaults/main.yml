@@ -1,0 +1,9 @@
+---
+
+munge_package: munge
+
+munge_key_path: /etc/munge/munge.key
+
+munge_user: munge
+
+munge_group: munge

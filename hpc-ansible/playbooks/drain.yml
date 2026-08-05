@@ -1,0 +1,40 @@
+---
+
+- name: Drain Slurm nodes before maintenance
+
+  hosts: compute:gpu
+
+  become: false
+
+  serial: 25
+
+
+  tasks:
+
+
+    - name: Drain node
+
+      command:
+
+        cmd: >
+          scontrol update
+          NodeName={{ inventory_hostname }}
+          State=DRAIN
+          Reason="Ansible maintenance"
+
+
+    - name: Wait for running jobs to finish
+
+      command:
+
+        cmd: squeue -h -w {{ inventory_hostname }}
+
+      register: jobs_running
+
+      retries: 60
+
+      delay: 60
+
+      until: jobs_running.stdout == ""
+
+      changed_when: false

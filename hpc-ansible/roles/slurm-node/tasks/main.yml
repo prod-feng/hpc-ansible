@@ -1,0 +1,83 @@
+---
+
+- name: Install Slurm compute packages
+
+  dnf:
+
+    name: "{{ slurm_packages }}"
+
+    state: present
+
+
+
+- name: Create Slurm directories
+
+  file:
+
+    path: "{{ item }}"
+
+    state: directory
+
+    owner: "{{ slurm_user }}"
+
+    group: "{{ slurm_group }}"
+
+    mode: "0755"
+
+  loop:
+
+    - "{{ slurm_conf_dir }}"
+
+    - "{{ slurmd_spool_dir }}"
+
+
+
+- name: Deploy Slurm configuration
+
+  template:
+
+    src: slurm.conf.j2
+
+    dest: "{{ slurm_conf_dir }}/slurm.conf"
+
+    owner: root
+
+    group: root
+
+    mode: "0644"
+
+  notify:
+
+    - Restart slurmd
+
+
+
+- name: Deploy cgroup configuration
+
+  template:
+
+    src: cgroup.conf.j2
+
+    dest: "{{ slurm_conf_dir }}/cgroup.conf"
+
+    owner: root
+
+    group: root
+
+    mode: "0644"
+
+  notify:
+
+    - Restart slurmd
+
+
+
+- name: Enable slurmd
+
+  service:
+
+    name: "{{ slurm_service }}"
+
+    enabled: true
+
+    state: started

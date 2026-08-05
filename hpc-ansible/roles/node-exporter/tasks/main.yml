@@ -1,0 +1,35 @@
+---
+
+- name: Create node exporter user
+
+  user:
+
+    name: "{{ node_exporter_user }}"
+
+    system: true
+
+    shell: /sbin/nologin
+
+
+
+- name: Install node exporter package
+
+  dnf:
+
+    name:
+
+      - prometheus-node-exporter
+
+    state: present
+
+
+
+- name: Enable node exporter
+
+  service:
+
+    name: node_exporter
+
+    enabled: true
+
+    state: started

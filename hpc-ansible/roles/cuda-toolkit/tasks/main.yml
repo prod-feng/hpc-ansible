@@ -1,0 +1,41 @@
+---
+
+- name: Install CUDA toolkit
+
+  dnf:
+
+    name:
+
+      - cuda-toolkit
+
+    state: present
+
+
+
+- name: Create CUDA module directory
+
+  file:
+
+    path: /opt/apps/modulefiles/cuda
+
+    state: directory
+
+    mode: "0755"
+
+
+
+- name: Create CUDA module file
+
+  copy:
+
+    dest: "/opt/apps/modulefiles/cuda/{{ cuda_version }}"
+
+    content: |
+
+      #%Module
+
+      prepend-path PATH {{ cuda_root }}/bin
+
+      prepend-path LD_LIBRARY_PATH {{ cuda_root }}/lib64
+
+    mode: "0644"

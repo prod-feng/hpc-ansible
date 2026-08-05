@@ -1,0 +1,28 @@
+---
+
+common_packages:
+
+  - vim-enhanced
+
+  - wget
+
+  - curl
+
+  - rsync
+
+  - lsof
+
+  - net-tools
+
+  - pciutils
+
+  - bash-completion
+
+  - tar
+
+  - unzip
+
+  - chrony
+
+
+limits_enabled: true

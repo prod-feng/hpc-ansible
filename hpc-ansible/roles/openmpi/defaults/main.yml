@@ -1,0 +1,6 @@
+---
+
+openmpi_version: "5.0"
+
+
+openmpi_prefix: "/opt/apps/openmpi/{{ openmpi_version }}"

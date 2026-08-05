@@ -1,0 +1,20 @@
+---
+
+- name: Install audit
+
+  dnf:
+
+    name: audit
+
+    state: present
+
+
+- name: Enable audit service
+
+  service:
+
+    name: auditd
+
+    enabled: true
+
+    state: started

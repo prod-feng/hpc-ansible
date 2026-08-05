@@ -1,0 +1,43 @@
+---
+
+- name: Install OpenMPI
+
+  dnf:
+
+    name:
+
+      - openmpi
+
+      - openmpi-devel
+
+    state: present
+
+
+
+- name: Create OpenMPI module directory
+
+  file:
+
+    path: /opt/apps/modulefiles/openmpi
+
+    state: directory
+
+    mode: "0755"
+
+
+
+- name: Create OpenMPI module file
+
+  copy:
+
+    dest: "/opt/apps/modulefiles/openmpi/{{ openmpi_version }}"
+
+    content: |
+
+      #%Module
+
+      prepend-path PATH /usr/lib64/openmpi/bin
+
+      prepend-path LD_LIBRARY_PATH /usr/lib64/openmpi/lib
+
+    mode: "0644"

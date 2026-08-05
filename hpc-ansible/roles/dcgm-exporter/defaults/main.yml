@@ -1,0 +1,8 @@
+---
+
+dcgm_exporter_image:
+
+  nvcr.io/nvidia/k8s/dcgm-exporter:latest
+
+
+dcgm_port: 9400

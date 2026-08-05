@@ -1,0 +1,17 @@
+---
+
+gpfs_packages:
+
+  - gpfs.base
+
+  - gpfs.gpl
+
+
+gpfs_mounts:
+
+  - mount: /gpfs
+
+    filesystem: gpfs0
+
+
+gpfs_enabled: true

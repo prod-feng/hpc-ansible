@@ -1,0 +1,22 @@
+[Unit]
+
+Description=NVIDIA Persistence Daemon
+
+
+After=network.target
+
+
+
+[Service]
+
+Type=forking
+
+ExecStart=/usr/bin/nvidia-persistenced --user root
+
+Restart=always
+
+
+
+[Install]
+
+WantedBy=multi-user.target

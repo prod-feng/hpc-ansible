@@ -1,0 +1,9 @@
+---
+- name: Configure NVIDIA GPU nodes
+  hosts: gpu
+  become: true
+
+  roles:
+
+    - nvidia
+    - slurm-gres      

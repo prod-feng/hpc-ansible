@@ -1,0 +1,18 @@
+---
+
+slurm_gres_type: gpu
+
+
+slurm_gres_autodetect: nvml
+
+
+slurm_gpu_count: 8
+
+
+slurm_gres_config:
+
+  - name: gpu
+
+    type: "{{ slurm_gres_type }}"
+
+    count: "{{ slurm_gpu_count }}"

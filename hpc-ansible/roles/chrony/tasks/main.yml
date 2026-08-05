@@ -1,0 +1,40 @@
+---
+
+- name: Install chrony
+
+  dnf:
+
+    name: "{{ chrony_package }}"
+
+    state: present
+
+
+- name: Configure chrony
+
+  template:
+
+    src: chrony.conf.j2
+
+    dest: /etc/chrony.conf
+
+    owner: root
+
+    group: root
+
+    mode: '0644'
+
+  notify:
+
+    - Restart chrony
+
+
+- name: Enable chronyd
+
+  service:
+
+    name: "{{ chrony_service }}"
+
+    enabled: true
+
+    state: started
+

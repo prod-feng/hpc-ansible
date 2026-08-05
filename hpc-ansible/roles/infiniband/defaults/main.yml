@@ -1,0 +1,24 @@
+---
+
+ib_packages:
+
+  - rdma-core
+
+  - libibverbs
+
+  - libibverbs-utils
+
+  - infiniband-diags
+
+  - perftest
+
+
+rdma_service: rdma
+
+
+ib_enabled: true
+
+
+ib_interfaces:
+
+  - ib0

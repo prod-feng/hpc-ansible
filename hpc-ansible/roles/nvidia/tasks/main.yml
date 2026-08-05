@@ -1,0 +1,79 @@
+---
+
+- name: Install NVIDIA repository dependencies
+
+  dnf:
+
+    name:
+
+      - kernel-devel
+
+      - kernel-headers
+
+      - gcc
+
+      - make
+
+    state: present
+
+
+
+- name: Install NVIDIA driver packages
+
+  dnf:
+
+    name: "{{ nvidia_packages }}"
+
+    state: present
+
+
+
+- name: Load NVIDIA kernel module
+
+  modprobe:
+
+    name: nvidia
+
+    state: present
+
+
+
+- name: Enable NVIDIA persistence mode
+
+  command:
+
+    cmd: nvidia-smi -pm 1
+
+  when: nvidia_persistence_mode
+
+  failed_when: false
+
+
+
+- name: Deploy NVIDIA module configuration
+
+  template:
+
+    src: modules-load.conf.j2
+
+    dest: /etc/modules-load.d/nvidia.conf
+
+    owner: root
+
+    group: root
+
+    mode: "0644"
+
+
+
+- name: Enable NVIDIA persistence daemon
+
+  service:
+
+    name: nvidia-persistenced
+
+    enabled: true
+
+    state: started
+
+  failed_when: false

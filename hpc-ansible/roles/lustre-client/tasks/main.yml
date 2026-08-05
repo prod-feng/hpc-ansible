@@ -1,0 +1,49 @@
+---
+
+- name: Install Lustre client packages
+
+  dnf:
+
+    name: "{{ lustre_packages }}"
+
+    state: present
+
+
+
+- name: Create Lustre mount directories
+
+  file:
+
+    path: "{{ item.mount }}"
+
+    state: directory
+
+    owner: root
+
+    group: root
+
+    mode: "0755"
+
+  loop:
+
+    - "{{ lustre_mounts }}"
+
+
+
+- name: Configure Lustre mounts
+
+  mount:
+
+    path: "{{ item.mount }}"
+
+    src: "{{ item.device }}"
+
+    fstype: "{{ item.fstype }}"
+
+    opts: "{{ item.options }}"
+
+    state: mounted
+
+  loop:
+
+    - "{{ lustre_mounts }}"

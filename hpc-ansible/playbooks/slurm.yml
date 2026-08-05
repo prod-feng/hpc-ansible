@@ -1,0 +1,20 @@
+---
+- name: Configure Slurm controller
+  hosts: controller
+  become: true
+
+  roles:
+
+    - munge
+    - slurm-controller
+
+
+- name: Configure Slurm compute nodes
+  hosts: compute
+  become: true
+
+  roles:
+
+    - munge
+    - slurm-node
+

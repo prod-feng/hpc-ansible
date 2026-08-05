@@ -1,0 +1,21 @@
+---
+
+nvidia_driver_version: "{{ gpu_driver_version | default('570') }}"
+
+
+cuda_version: "{{ cuda_version | default('12.6') }}"
+
+
+nvidia_packages:
+
+  - nvidia-driver
+
+  - nvidia-driver-cuda
+
+
+nvidia_persistence_mode: true
+
+
+nvidia_tools:
+
+  - nvidia-smi

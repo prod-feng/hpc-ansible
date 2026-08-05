@@ -1,0 +1,14 @@
+---
+
+slurm_gres:
+
+  name: gpu
+
+  type: nvidia
+
+  count: 8
+
+
+nvidia_driver_version: "570"
+
+cuda_version: "12.6"

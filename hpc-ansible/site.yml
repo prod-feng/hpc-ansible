@@ -1,0 +1,13 @@
+---
+
+- import_playbook: playbooks/common.yml
+
+- import_playbook: playbooks/slurm.yml
+
+- import_playbook: playbooks/storage.yml
+
+- import_playbook: playbooks/gpu.yml
+- import_playbook: playbooks/healthcheck.yml
+- import_playbook: playbooks/monitoring.yml
+- import_playbook: playbooks/software.yml
+

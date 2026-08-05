@@ -1,0 +1,67 @@
+---
+
+- name: Install Slurm GPU support packages
+
+  dnf:
+
+    name:
+
+      - slurm
+
+      - slurm-contribs
+
+    state: present
+
+
+
+- name: Create Slurm configuration directory
+
+  file:
+
+    path: /etc/slurm
+
+    state: directory
+
+    mode: "0755"
+
+
+
+- name: Deploy GRES configuration
+
+  template:
+
+    src: gres.conf.j2
+
+    dest: /etc/slurm/gres.conf
+
+    owner: root
+
+    group: root
+
+    mode: "0644"
+
+  notify:
+
+    - Restart slurmd
+
+
+
+- name: Verify NVIDIA devices exist
+
+  command:
+
+    cmd: nvidia-smi -L
+
+  register: gpu_check
+
+  changed_when: false
+
+  failed_when: false
+
+
+
+- name: Display detected GPUs
+
+  debug:
+
+    var: gpu_check.stdout_lines

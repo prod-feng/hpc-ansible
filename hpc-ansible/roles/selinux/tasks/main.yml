@@ -1,0 +1,9 @@
+---
+
+- name: Configure SELinux mode
+
+  ansible.posix.selinux:
+
+    policy: targeted
+
+    state: "{{ selinux_state }}"

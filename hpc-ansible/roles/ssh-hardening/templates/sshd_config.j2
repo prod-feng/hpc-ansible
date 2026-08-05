@@ -1,0 +1,17 @@
+Port {{ ssh_port }}
+
+PermitRootLogin {{ ssh_permit_root_login }}
+
+PasswordAuthentication {{ ssh_password_authentication }}
+
+X11Forwarding {{ ssh_x11_forwarding }}
+
+UseDNS no
+
+GSSAPIAuthentication yes
+
+ClientAliveInterval 300
+
+ClientAliveCountMax 2
+
+AllowGroups {{ ssh_allow_groups | join(' ') }}

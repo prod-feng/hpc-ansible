@@ -1,0 +1,38 @@
+---
+
+- name: Resume Slurm nodes
+
+  hosts: compute:gpu
+
+  become: false
+
+
+  tasks:
+
+
+    - name: Resume node
+
+      command:
+
+        cmd: >
+          scontrol update
+          NodeName={{ inventory_hostname }}
+          State=RESUME
+
+
+    - name: Check node state
+
+      command:
+
+        cmd: scontrol show node {{ inventory_hostname }}
+
+      register: node_status
+
+      changed_when: false
+
+
+    - name: Display status
+
+      debug:
+
+        var: node_status.stdout

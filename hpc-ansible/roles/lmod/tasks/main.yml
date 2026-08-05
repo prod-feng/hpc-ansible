@@ -1,0 +1,45 @@
+---
+
+- name: Install Lmod
+
+  dnf:
+
+    name: "{{ lmod_package }}"
+
+    state: present
+
+
+
+- name: Create module tree
+
+  file:
+
+    path: "{{ module_root }}"
+
+    state: directory
+
+    owner: root
+
+    group: root
+
+    mode: "0755"
+
+
+
+- name: Configure module environment
+
+  copy:
+
+    dest: /etc/profile.d/modules.sh
+
+    content: |
+
+      # HPC Modules
+
+      source /etc/profile.d/lmod.sh
+
+    owner: root
+
+    group: root
+
+    mode: "0644"

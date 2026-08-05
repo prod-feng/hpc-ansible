@@ -1,0 +1,27 @@
+---
+
+slurm_version: "24.05"
+
+
+slurm_user: slurm
+
+
+slurm_group: slurm
+
+
+slurm_conf_dir: /etc/slurm
+
+
+slurm_controller_service: slurmctld
+
+
+slurm_controller_host: "{{ controller_host }}"
+
+
+slurm_port: 6817
+
+
+slurm_compute_partition: compute
+
+
+slurm_compute_default_memory: 4000

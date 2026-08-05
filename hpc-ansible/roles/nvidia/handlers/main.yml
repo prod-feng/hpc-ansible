@@ -1,0 +1,9 @@
+---
+
+- name: Restart nvidia persistence daemon
+
+  service:
+
+    name: nvidia-persistenced
+
+    state: restarted
