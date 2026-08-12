@@ -1,0 +1,38 @@
+---
+- name: Create user folders
+  hosts: localhost
+  become: false
+#
+# Change the following DICT of users,so to make folders for these new users.
+# E.g, /luster/home/feng, /luster/scratch/feng, /luster/projects/hpc_support/feng
+#
+  vars:
+    users:
+      - name: feng
+        groups: hpc_support
+
+  tasks:
+      - name: Check folder status
+        ansible.builtin.stat:
+          path: "/lustre/{{ item.1 }}{{ '/' ~ item.0.groups if item.1 == 'projects' else '' }}/{{ item.0.name }}"
+        register: folder_details
+        loop: "{{ users | product(['home', 'scratch', 'projects']) | list }}"          
+
+
+      - name: Directory does not exist
+        ansible.builtin.debug:
+          msg: "Directory does not exist"
+        when: not item.stat.exists
+        loop: "{{ folder_details.results }}"  
+
+      - name: Create folders
+        file:
+           path: "{{item.invocation.module_args.path}}"
+           state: directory
+           owner: "{{ item.item.0.name }}"
+           group: "{{ item.item.0.groups }}"
+           mode: "0750"
+        #ansible.builtin.debug:
+        #  msg: "Create folder: {{item.invocation.module_args.path}}"
+        when: not item.stat.exists     
+        loop: "{{ folder_details.results }}"
