@@ -1,0 +1,97 @@
+---
+- name: Create Slurm user accounts
+  hosts: localhost
+  become: false
+#
+# Change the following DICT slurm_users.
+# Make Slurm accounts for the users.
+#
+  vars:
+    slurm_users:
+      - name: feng
+        default_account: hpc_support
+        admin_level: None
+
+
+  tasks:
+    - name: Query existing users
+      command:
+        argv:
+          - sacctmgr
+          - -nP
+          - show
+          - user
+          - "{{ item.name }}"
+      register: user_check
+      changed_when: false
+      failed_when: false
+      loop: "{{ slurm_users }}"
+      tags: query_user
+        
+    - name: Check users result
+      ansible.builtin.debug:
+          msg: "User does not exist. Creating it..."
+      when: item.stdout != ""
+      loop: "{{ user_check.results }}"        
+
+    - name: Query Default accounts
+      command:
+        argv:
+          - sacctmgr
+          - -nP
+          - show
+          - account
+          - "{{ item.default_account }}"
+      register: account_check
+      changed_when: false
+      failed_when: false
+      loop: "{{ slurm_users }}"
+
+    - name: Check group stdout
+      ansible.builtin.debug:
+          msg: "Account does not exist. Creating it..."
+      when: item.stdout == ""
+      loop: "{{ account_check.results }}"
+
+    - name: Create accounts
+      command:
+        argv:
+          - sacctmgr
+          - -i
+          - add
+          - account
+          - "name={{ item.item.default_account }}"
+          - "parent=clinwulf"
+        #      - "Description={{ item.item.description }}"
+        #- "Organization={{ item.item.organization }}"
+      when: item.stdout == ""
+      loop: "{{ account_check.results }}"
+
+    - name: Create users
+      command:
+        argv:
+          - sacctmgr
+          - -i
+          - add
+          - user
+          - "{{ item.item.name }}"
+          - "DefaultAccount={{ item.item.default_account }}"
+          - "AdminLevel={{ item.item.admin_level }}"
+      when: item.stdout == ""
+      loop: "{{ user_check.results }}"
+      tags: tocreate
+
+    - name: Update default account
+      command:
+        argv:
+          - sacctmgr
+          - -i
+          - modify
+          - user
+          - where
+          - "name={{ item.item.name }}"
+          - set
+          - "DefaultAccount={{ item.item.default_account }}"
+      when: item.stdout != ""      
+      loop: "{{  user_check.results }}"
+      tags: toupdate
