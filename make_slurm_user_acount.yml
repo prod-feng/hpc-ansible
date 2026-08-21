@@ -13,14 +13,6 @@
         default_account: feng-group
         admin_level: None
 
-
-    slurm_associations:
-      - user: alice
-        account: chemistry
-        cluster: cluster01
-        partition: ""
-        qos: normal
-
   tasks:
     #- name: Debug slurm_users
     #  ansible.builtin.debug:
