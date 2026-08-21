@@ -1,0 +1,31 @@
+- name: Create user folders
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - ./hpc_users.yml
+
+  tasks:
+    - name: Create project folders
+      ansible.builtin.file:
+        path: "/tmp/vast/projects/{{ item.0.groups }}"
+        state: directory
+        owner: "{{ item.0.name }}"
+        group: "{{ item.0.adgrp }}"
+        mode: "0770"
+      loop: "{{ hpc_users | product(['projects']) | list }}"
+      loop_control:
+        label: "{{ item.0.name }}/projects/{{ item.0.groups }}"
+      failed_when: false
+    - name: Create home, scratch and project folders
+      ansible.builtin.file:
+        path: >-
+          /tmp/vast/{{ item.1 }}{% if item.1 == 'projects' %}/{{ item.0.groups }}{% endif %}/{{ item.0.name }}
+        state: directory
+        owner: "{{ item.0.name }}"
+        group: "{{ item.0.name }}"
+        mode: "0750"
+      loop: "{{ hpc_users | product(['home', 'scratch', 'projects']) | list }}"
+      loop_control:
+        label: "{{ item.0.name }}/{{ item.1 }}"
+      failed_when: false
