@@ -1,38 +1,58 @@
 ---
 - name: Create user folders
   hosts: localhost
-  become: false
-#
-# Change the following DICT of users,so to make folders for these new users.
-# E.g, /luster/home/feng, /luster/scratch/feng, /luster/projects/hpc_support/feng
-#
+    #become: false
+  gather_facts: false
+
   vars:
     users:
       - name: feng
-        groups: hpc_support
+        groups: rci
+        adgrp: support
 
   tasks:
-      - name: Check folder status
+      - name: Check projects folder
         ansible.builtin.stat:
-          path: "/lustre/{{ item.1 }}{{ '/' ~ item.0.groups if item.1 == 'projects' else '' }}/{{ item.0.name }}"
+          path: "/tmp/lustre/{{ item.1 }}/{{ item.0.groups }}"
+        register: project_folder
+        loop: "{{ users | product(['projects']) | list }}"
+      # Be careful, the /xxx/projects/ folder needs to be made before run this palybook.
+      # Otherwise, /xxx/projects/ folder will get the 0770 permission and group/owner. not the
+      # expetced /xxx/projects/support/ folder.
+      # /xxx/projects/support/feng folder will be treated later.
+      - name: Create projects folders
+        file:
+           path: "{{item.invocation.module_args.path}}"
+           state: directory
+           owner: "{{ item.item.0.name }}"
+           group: "{{ item.item.0.adgrp }}"
+           mode: "0770"
+        when: not item.stat.exists
+        loop: "{{ project_folder.results }}"
+
+      - name: Check all other folder status
+        ansible.builtin.stat:
+          path: "/tmp/vast/{{ item.1 }}{{ '/' ~ item.0.groups if item.1 == 'projects' else '' }}/{{ item.0.name }}"
+          #path: "{{ '/vast/'~item.1~('/'~item.0.groups if item.1=='projects')~'/'~item.0.name }}"
         register: folder_details
-        loop: "{{ users | product(['home', 'scratch', 'projects']) | list }}"          
+        loop: "{{ users | product(['home', 'scratch', 'projects']) | list }}"
 
 
       - name: Directory does not exist
         ansible.builtin.debug:
           msg: "Directory does not exist"
         when: not item.stat.exists
-        loop: "{{ folder_details.results }}"  
+        loop: "{{ folder_details.results }}"
 
       - name: Create folders
         file:
            path: "{{item.invocation.module_args.path}}"
            state: directory
            owner: "{{ item.item.0.name }}"
-           group: "{{ item.item.0.groups }}"
+           group: "{{ item.item.0.name }}" #"{{ item.item.0.groups }}"
            mode: "0750"
         #ansible.builtin.debug:
         #  msg: "Create folder: {{item.invocation.module_args.path}}"
-        when: not item.stat.exists     
+        when: not item.stat.exists
+        loop: "{{ folder_details.results }}"        when: not item.stat.exists     
         loop: "{{ folder_details.results }}"
