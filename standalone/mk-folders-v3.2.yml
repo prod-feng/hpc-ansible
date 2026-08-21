@@ -1,0 +1,52 @@
+---
+- name: Create user folders
+  hosts: localhost
+    #become: false
+  gather_facts: false  
+
+  vars_files:
+    - ./hpc_users.yml    
+
+  tasks:
+      - name: Check projects folder
+        ansible.builtin.stat:
+          path: "/tmp/vast/{{ item.1 }}/{{ item.0.groups }}"
+        register: project_folder
+        loop: "{{ hpc_users | product(['projects']) | list }}"
+
+      - name: Create projects folders
+        file:
+           path: "{{item.invocation.module_args.path}}"
+           state: directory
+           owner: "{{ item.item.0.name }}"
+           group: "{{ item.item.0.adgrp }}"
+           mode: "0770"
+        when: not item.stat.exists
+        loop: "{{ project_folder.results }}"
+
+      - name: Check all other folder status
+        ansible.builtin.stat:
+          path: "/tmp/vast/{{ item.1 }}{{ '/' ~ item.0.groups if item.1 == 'projects' else '' }}/{{ item.0.name }}"
+          #path: "{{ '/vast/'~item.1~('/'~item.0.groups if item.1=='projects')~'/'~item.0.name }}"
+        register: folder_details
+        loop: "{{ hpc_users | product(['home', 'scratch', 'projects']) | list }}"          
+
+
+      - name: Directory does not exist
+        ansible.builtin.debug:
+          msg: "Directory does not exist"
+        when: not item.stat.exists
+        loop: "{{ folder_details.results }}"  
+
+      - name: Create folders
+        file:
+           path: "{{item.invocation.module_args.path}}"
+           state: directory
+           owner: "{{ item.item.0.name }}"
+           group: "{{ item.item.0.name }}" #"{{ item.item.0.groups }}"
+           mode: "0750"
+        #ansible.builtin.debug:
+        #  msg: "Create folder: {{item.invocation.module_args.path}}"
+        when: not item.stat.exists     
+        loop: "{{ folder_details.results }}"
+          #failed_when: false
