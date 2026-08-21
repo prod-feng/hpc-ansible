@@ -1,0 +1,17 @@
+
+Update hpc_users.yml file:
+
+new users, accounts, etc.
+
+
+Test:
+
+ansible-playbook  mk-slurm-account-v3.2.yml --check --diff -v
+ansible-playbook  mk-folders-v3.2.yml --check --diff -v
+
+Run:
+
+ansible-playbook  mk-slurm-account-v3.2.yml   --diff 
+ansible-playbook  mk-folders-v3.2.yml --diff
+
+
