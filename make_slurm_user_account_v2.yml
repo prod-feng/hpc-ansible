@@ -1,0 +1,117 @@
+---
+- name: Create and configure Slurm users
+  hosts: localhost
+  become: false
+  gather_facts: false
+
+  vars:
+    slurm_parent_account: aabbcc
+
+    slurm_users:
+      - name: feng
+        default_account: rci
+        admin_level: None
+
+      - name: wulf
+        default_account: feng-group
+        admin_level: None
+
+  tasks:
+
+    # ============================================================
+    # ACCOUNTS
+    # ============================================================
+
+    - name: Get required Slurm accounts
+      ansible.builtin.set_fact:
+        required_accounts: >-
+          {{
+            slurm_users
+            | map(attribute='default_account')
+            | unique
+            | list
+          }}
+
+    - name: Query existing Slurm accounts
+      ansible.builtin.command:
+        argv:
+          - sacctmgr
+          - -nP
+          - show
+          - account
+          - format=Account
+      register: slurm_account_query
+      changed_when: false
+
+    - name: Calculate missing Slurm accounts
+      ansible.builtin.set_fact:
+        accounts_to_create: >-
+          {{
+            required_accounts
+            | difference(
+                slurm_account_query.stdout_lines
+                | map('regex_replace', '\|.*$', '')
+                | list
+              )
+          }}
+
+    - name: Create missing Slurm accounts
+      ansible.builtin.command:
+        argv:
+          - sacctmgr
+          - -i
+          - add
+          - account
+          - "Name={{ item }}"
+          - "Parent={{ slurm_parent_account }}"
+      loop: "{{ accounts_to_create }}"
+      changed_when: true
+      failed_when: false
+
+    # ============================================================
+    # USERS
+    # ============================================================
+
+    - name: Query existing Slurm users
+      ansible.builtin.command:
+        argv:
+          - sacctmgr
+          - -nP
+          - show
+          - user
+          - format=User,DefaultAccount
+      register: slurm_user_query
+      changed_when: false
+
+
+    - name: Create missing Slurm users
+      ansible.builtin.command:
+        argv:
+          - sacctmgr
+          - -i
+          - add
+          - user
+          - "Name={{ item.name }}"
+          - "DefaultAccount={{ item.default_account }}"
+          - "AdminLevel={{ item.admin_level }}"
+      loop: "{{ slurm_users }}"
+      when: (item.name ~ '|') not in (slurm_user_query.stdout | default({}))
+      changed_when: true
+      failed_when: false
+
+    - name: Update incorrect Slurm default accounts
+      ansible.builtin.command:
+        argv:
+          - sacctmgr
+          - -i
+          - modify
+          - user
+          - "Name={{ item.name }}"
+          - set
+          - "DefaultAccount={{ item.default_account }}"
+      loop: "{{ slurm_users }}"
+      when:
+        - (item.name ~ '|') in (slurm_user_query.stdout | default({}))
+        -  (item.name  ~ '|' ~ item.default_account) not in  (slurm_user_query.stdout | default({}))
+      changed_when: true
+      failed_when: false      
