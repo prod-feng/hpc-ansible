@@ -55,5 +55,4 @@
         #ansible.builtin.debug:
         #  msg: "Create folder: {{item.invocation.module_args.path}}"
         when: not item.stat.exists
-        loop: "{{ folder_details.results }}"        when: not item.stat.exists     
-        loop: "{{ folder_details.results }}"
+        loop: "{{ folder_details.results }}"       
