@@ -1,19 +1,73 @@
 ---
-- name: Create Slurm user accounts
+- name: Create Slurm users
   hosts: localhost
   become: false
-#
-# Change the following DICT slurm_users.
-# Make Slurm accounts for the users.
-#
+
   vars:
     slurm_users:
-      - name: feng
-        default_account: hpc_support
+    #update this var
+      - name: fzhang
+        default_account: rci
+        admin_level: None
+      - name: wulf
+        default_account: feng-group
         admin_level: None
 
 
+    slurm_associations:
+      - user: alice
+        account: chemistry
+        cluster: cluster01
+        partition: ""
+        qos: normal
+
   tasks:
+    #- name: Debug slurm_users
+    #  ansible.builtin.debug:
+    #    var: slurm_users
+    #
+    #  Map accounts to be unique  
+    - name: Get unique default accounts
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ slurm_users | map(attribute='default_account') | unique | list }}"
+
+
+    - name: Query accounts
+      command:
+        argv:
+          - sacctmgr
+          - -nP
+          - show
+          - account
+          - "{{ item }}"
+      register: account_check
+      changed_when: false
+      failed_when: false
+      loop: "{{ slurm_users | map(attribute='default_account') | unique | list }}"  
+
+    - name: Check account results
+      ansible.builtin.debug:
+          msg: "Account does not exist. Creating it..."
+      when: item.stdout == ""
+      loop: "{{ account_check.results }}"
+
+    - name: Create accounts
+      command:
+        argv:
+          - sacctmgr
+          - -i
+          - add
+          - account
+          - "name={{ item.item }}"
+          - "parent=clinwulf"
+        #      - "Description={{ item.item.description }}"
+        #- "Organization={{ item.item.organization }}"
+      when: item.stdout == ""
+      failed_when: false  
+      loop: "{{ account_check.results }}"
+
+    # Now work on users
     - name: Query existing users
       command:
         argv:
@@ -27,45 +81,14 @@
       failed_when: false
       loop: "{{ slurm_users }}"
       tags: query_user
-        
-    - name: Check users result
+
+    - name: Check users results
       ansible.builtin.debug:
           msg: "User does not exist. Creating it..."
-      when: item.stdout != ""
-      loop: "{{ user_check.results }}"        
-
-    - name: Query Default accounts
-      command:
-        argv:
-          - sacctmgr
-          - -nP
-          - show
-          - account
-          - "{{ item.default_account }}"
-      register: account_check
-      changed_when: false
-      failed_when: false
-      loop: "{{ slurm_users }}"
-
-    - name: Check group stdout
-      ansible.builtin.debug:
-          msg: "Account does not exist. Creating it..."
       when: item.stdout == ""
-      loop: "{{ account_check.results }}"
+      failed_when: false        
+      loop: "{{ user_check.results }}"
 
-    - name: Create accounts
-      command:
-        argv:
-          - sacctmgr
-          - -i
-          - add
-          - account
-          - "name={{ item.item.default_account }}"
-          - "parent=clinwulf"
-        #      - "Description={{ item.item.description }}"
-        #- "Organization={{ item.item.organization }}"
-      when: item.stdout == ""
-      loop: "{{ account_check.results }}"
 
     - name: Create users
       command:
@@ -78,6 +101,7 @@
           - "DefaultAccount={{ item.item.default_account }}"
           - "AdminLevel={{ item.item.admin_level }}"
       when: item.stdout == ""
+      failed_when: false        
       loop: "{{ user_check.results }}"
       tags: tocreate
 
@@ -92,6 +116,7 @@
           - "name={{ item.item.name }}"
           - set
           - "DefaultAccount={{ item.item.default_account }}"
-      when: item.stdout != ""      
+      when: item.stdout != "" 
+      failed_when: false        
       loop: "{{  user_check.results }}"
       tags: toupdate
