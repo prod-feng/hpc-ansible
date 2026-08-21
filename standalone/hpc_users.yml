@@ -1,0 +1,14 @@
+hpc_users:
+  - name: feng
+    groups: rci
+    default_account: rci
+    admin_level: None
+    adgrp: clinwulfsupport
+
+  - name: wulf
+    groups: rci
+    default_account: feng-group
+    admin_level: None
+    adgrp: support      
+
+slurm_parent_account: wulf
