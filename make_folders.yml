@@ -4,6 +4,7 @@
     #become: false
   gather_facts: false
 
+  # Change the following vars of users:
   vars:
     users:
       - name: feng
